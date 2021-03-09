@@ -49,8 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
       inputDuration += '.';
     }
     
+    // Create note
+    let note = {'duration': inputDuration, 'pitch': inputNote, 'isDotted': isDotted};
+
     // Add note to the array
-    notes = [...notes, {'duration': inputDuration, 'note': inputNote, 'isDotted': isDotted}];
+    notes = [...notes, note];
     
     console.log(notes);
     

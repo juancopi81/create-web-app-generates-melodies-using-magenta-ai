@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>My music web app</title>
+
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css" />
+    
+    <!-- Add Vexflow -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vexflow/3.0.9/vexflow-debug.js" integrity="sha512-lKd1a91LRkmZa8zZUEdjzgepWZpue8mVl5ikn1Itf1nQoNQsnzuEMbAQJz6C/dVYSw63GFYo+t0M+bCnLZf/Sg==" crossorigin="anonymous"></script>
+
+    <!-- import the webpage's javascript file -->
+    <script src="/script.js" defer></script>
+  </head>
+  <body>
+    <!-- Input form -->
+    <form id="input-form">
+      
+      <!-- Duration -->
+      <label for="duration">Duration</label>
+      <select id="duration" required>
+        <option value="" selected disabled>...</option>
+        <option value="1">&#119133;</option>
+        <option value="2">&#119134;</option>
+        <option value="4">&#119135;</option>
+        <option value="8">&#119136;</option>
+        <option value="16">&#119137;</option>
+        <option value="r1">&#119099;</option>
+        <option value="r2">&#119100;</option>
+        <option value="r4">&#119101;</option>
+        <option value="r8">&#119102;</option>
+        <option value="r16">&#119103;</option>
+      </select>
+      
+      <!-- Pith -->
+      <label for="pitch">Pitch</label>
+      <select id="pitch" required>
+        <option value="" selected disabled>...</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+        <option value="E">E</option>
+        <option value="F">F</option>
+        <option value="G">G</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+      </select>
+
+      <!-- Accidental -->
+      <label for="accidental">Accidental</label>
+      <select id="accidental" required>
+        <option value="" selected disabled>...</option>
+        <option value="">&#9837;</option>
+        <option value="">&#9838;</option>
+        <option value="">&#9839;</option>
+      </select>
+
+      <!-- Octave -->
+      <label for="octave">Octave</label>
+      <select id="octave" required>
+        <option value="" selected disabled>...</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+
+      <!-- Dot -->
+      <input id="dotted" type="checkbox" />
+
+      <!-- Button -->
+      <button id="input">
+        Add
+      </button>
+    </form>
+    
+    <!-- Staff -->
+    <div id="staff">
+      
+    </div>
+  </body>
+</html>

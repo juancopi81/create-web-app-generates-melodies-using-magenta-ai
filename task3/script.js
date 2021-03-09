@@ -6,6 +6,7 @@ let notes = [];
 
 // Variable to keep track of render notes
 const notesEmptyStaff = "B4/4/r, B4/4/r, B4/4/r, B4/4/r";
+let renderNotes;
 
 // Vexflow variable
 let VF = Vex.Flow;
@@ -58,8 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
       inputDuration += '.';
     }
     
+    // Create note
+    let note = {'duration': inputDuration, 'pitch': inputNote, 'isDotted': isDotted};
+
     // Add note to the array
-    notes = [...notes, {'duration': inputDuration, 'note': inputNote, 'isDotted': isDotted}];
+    notes = [...notes, note];
   }
 })
 

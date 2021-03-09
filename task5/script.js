@@ -61,12 +61,42 @@ document.addEventListener('DOMContentLoaded', () => {
       isDotted = true;
       inputDuration += '.';
     }
-
+    
     // Create note
     let note = {'duration': inputDuration, 'pitch': inputNote, 'isDotted': isDotted};
     
+    // Check if adding note duration would exced 4/4 allowed duration
+    let noteDurationInSixteenth = calculateNoteDurationInSixteenth(note);
+    
+    // Avoid adding the note
+    if (noteDurationInSixteenth + totalCurrentDuration > 16) {
+      return false;
+    }
+    
     // Add note to the array
-    notes = [...notes, {'duration': inputDuration, 'pitch': inputNote, 'isDotted': isDotted}];
+    notes = [...notes, note];
+    
+    // Calculate how many rests should be added to complete the bar
+    let restsString = restsToComplete(notes);  
+    
+    // Parse the notes 
+    let [notesString, currentDuration] = parseNotesToVex(notes);
+    
+    console.log(restsString, notesString);
+    
+    // Update total current duration
+    totalCurrentDuration = currentDuration;
+    
+    // Concatenate parsed notes to the rest to complet
+    renderNotes = notesString + restsString;
+    
+    // Draw the staff 
+    createStaff(renderNotes);
+    
+    // If seed melody equals the allowed duration, disable more input
+    if (totalCurrentDuration === 16) {
+      document.getElementById('input').disabled = true;
+    }
   }
 })
 
@@ -152,15 +182,47 @@ function parseNotesToVex(notes) {
 function calculateNoteDurationInSixteenth(note) {
   
   // Remove r if is a rest
-  let noteDuration = note.duration.replace('r', '');
+	let noteDuration = note.duration.replace('r', '');
   
   // Calculate the duration of the notes in 16th
-  let noteDurationInSixteenth = (16 / parseInt(noteDuration));
+	let noteDurationInSixteenth = (16 / parseInt(noteDuration));
 
-  // If dotted increase value respectively
-  if (note.dot) {
-    noteDurationInSixteenth += noteDurationInSixteenth / 2;
-  }
+	// If dotted increase value respectively
+	if (note.dot) {
+		noteDurationInSixteenth += noteDurationInSixteenth / 2;
+	}
   
   return noteDurationInSixteenth;
+}
+
+// Calculate rests to complete the 4/4 bar
+function restsToComplete(notes) {
+  
+  // Initialize rest to the total of 16 notes
+  let restsDuration = 16;
+  
+  // Initialize the duration of notes to zero
+  let notesDuration = 0;
+  
+  // Loop over each note
+  for (let note of notes) {
+    
+    // Calculate the duration of the note
+    let noteDuration = calculateNoteDurationInSixteenth(note);
+    
+    // Update notes duration
+    notesDuration += noteDuration;
+  }
+  
+  // Calculate what we need to use in rests
+  restsDuration -= notesDuration;
+  
+  let quarterRests = Math.floor(restsDuration / 4);
+  let sixteenthRests = restsDuration % 4;
+  
+  // Stringify the value of our rests
+  let quarterRestsString = 'B4/4/r,'.repeat(quarterRests);
+  let sixteenthRestsString = 'B4/16/r,'.repeat(sixteenthRests);
+  
+  return quarterRestsString + sixteenthRestsString; 
 }
