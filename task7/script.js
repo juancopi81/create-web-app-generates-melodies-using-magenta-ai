@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('erase').addEventListener('click', () => {
     notes = [];
     createStaff(notesEmptyStaff);
+    totalCurrentDuration = 0;
+    document.getElementById('input').disabled = false;
   });
   
   // Disable some options based on user's selection
