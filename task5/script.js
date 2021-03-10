@@ -188,7 +188,7 @@ function calculateNoteDurationInSixteenth(note) {
 	let noteDurationInSixteenth = (16 / parseInt(noteDuration));
 
 	// If dotted increase value respectively
-	if (note.dot) {
+	if (note.isDotted) {
 		noteDurationInSixteenth += noteDurationInSixteenth / 2;
 	}
   

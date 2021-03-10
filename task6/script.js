@@ -1,6 +1,22 @@
 /* If you're feeling fancy you can add interactivity 
     to your site with Javascript */
 
+// Salamander Sampler
+const sampler = new Tone.Sampler({
+  urls : {
+    "C4": "C4.mp3",
+		"D#4": "Ds4.mp3",
+		"F#4": "Fs4.mp3",
+		"A4": "A4.mp3",
+    "C5": "C5.mp3",
+		"D#5": "Ds5.mp3",
+		"F#5": "Fs5.mp3",
+		"A5": "A5.mp3"
+  },
+  release: 1,
+  baseUrl: "https://tonejs.github.io/audio/salamander/",
+}).toDestination();
+
 // Variable to keep track of notes
 let notes = [];
 
@@ -61,14 +77,53 @@ document.addEventListener('DOMContentLoaded', () => {
       isDotted = true;
       inputDuration += '.';
     }
-
+    
     // Create note
     let note = {'duration': inputDuration, 'pitch': inputNote, 'isDotted': isDotted};
     
+    // Check if adding note duration would exced 4/4 allowed duration
+    let noteDurationInSixteenth = calculateNoteDurationInSixteenth(note);
+    
+    // Avoid adding the note
+    if (noteDurationInSixteenth + totalCurrentDuration > 16) {
+      return false;
+    }
+    
     // Add note to the array
-    notes = [...notes, {'duration': inputDuration, 'pitch': inputNote, 'isDotted': isDotted}];
+    notes = [...notes, note];
+    
+    // Calculate how many rests should be added to complete the bar
+    let restsString = restsToComplete(notes);  
+    
+    // Parse the notes 
+    let [notesString, currentDuration] = parseNotesToVex(notes);
+    
+    console.log(notesString, restsString);
+    
+    // Update total current duration
+    totalCurrentDuration = currentDuration;
+    
+    // Concatenate parsed notes to the rest to complet
+    renderNotes = notesString + restsString;
+    
+    // Draw the staff 
+    createStaff(renderNotes);
+    
+    // If seed melody equals the allowed duration, disable more input
+    if (totalCurrentDuration === 16) {
+      document.getElementById('input').disabled = true;
+    }
   }
+  
+  // Play sounds when button is pressed
+  document.getElementById('play').onclick = async () => {
+    await Tone.start();
+    sampler.triggerAttackRelease(["Eb4", "G4", "Bb4"], 4);
+  }
+  
 })
+
+// VEXFLOW
 
 // Create a staff using Vexflow with renderNotes
 function createStaff(renderNotes) {
@@ -152,15 +207,51 @@ function parseNotesToVex(notes) {
 function calculateNoteDurationInSixteenth(note) {
   
   // Remove r if is a rest
-  let noteDuration = note.duration.replace('r', '');
+	let noteDuration = note.duration.replace('r', '');
   
   // Calculate the duration of the notes in 16th
-  let noteDurationInSixteenth = (16 / parseInt(noteDuration));
+	let noteDurationInSixteenth = (16 / parseInt(noteDuration));
 
-  // If dotted increase value respectively
-  if (note.isDotted) {
-    noteDurationInSixteenth += noteDurationInSixteenth / 2;
-  }
+	// If dotted increase value respectively
+	if (note.isDotted) {
+		noteDurationInSixteenth += noteDurationInSixteenth / 2;
+	}
   
   return noteDurationInSixteenth;
 }
+
+// Calculate rests to complete the 4/4 bar
+function restsToComplete(notes) {
+  
+  // Initialize rest to the total of 16 notes
+  let restsDuration = 16;
+  
+  // Initialize the duration of notes to zero
+  let notesDuration = 0;
+  
+  // Loop over each note
+  for (let note of notes) {
+    
+    // Calculate the duration of the note
+    let noteDuration = calculateNoteDurationInSixteenth(note);
+    
+    console.log(noteDuration);
+    
+    // Update notes duration
+    notesDuration += noteDuration;
+  }
+  
+  // Calculate what we need to use in rests
+  restsDuration -= notesDuration;
+  
+  let quarterRests = Math.floor(restsDuration / 4);
+  let sixteenthRests = restsDuration % 4;
+  
+  // Stringify the value of our rests
+  let quarterRestsString = 'B4/4/r,'.repeat(quarterRests);
+  let sixteenthRestsString = 'B4/16/r,'.repeat(sixteenthRests);
+  
+  return quarterRestsString + sixteenthRestsString; 
+}
+
+// TONE.JS
