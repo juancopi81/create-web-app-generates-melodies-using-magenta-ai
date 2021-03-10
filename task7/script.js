@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Create a new staff
   createStaff(notesEmptyStaff);
-
+  
   // Erase render notes and resets notes
   document.getElementById('erase').addEventListener('click', () => {
     notes = [];
@@ -123,10 +123,15 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Play sounds when button is pressed
   document.getElementById('play').onclick = async () => {
+    
+    // promise resolved when audio context is started
     await Tone.start();
-    sampler.triggerAttackRelease(["Eb4", "G4", "Bb4"], 4);
+    
+    const player = new TonePlayer();
+    let bpm = parseInt(document.getElementById('bpm').value);
+    
+    player.play(notes, bpm);
   }
-  
 })
 
 // VEXFLOW
@@ -261,3 +266,59 @@ function restsToComplete(notes) {
 }
 
 // TONE.JS
+// Use tone transport to schedule the notes
+class TonePlayer {
+  
+  constructor() {
+    this.sampler = sampler;
+  }
+  
+  play(notes, bpm) {
+    
+    const sampler = this.sampler
+    
+    // Stop and reset all the events from the tranposrt
+    Tone.Transport.stop();
+    Tone.Transport.position = 0;
+    Tone.Transport.cancel();
+    
+    // Set the bpm
+    Tone.Transport.bpm.value = bpm;
+    
+    // Schedule the notes, time represents absolute time in seconds
+    Tone.Transport.schedule((time) => {
+      
+      // Relative time of note with respect to the start of mesaure, in seconds
+      let relativeTime = 0;
+      
+      // Loop over the notes
+      for (const note of notes) {
+        
+        // Remove the dot and rest
+        let noteDuration = note.duration.replace('.', '');
+        noteDuration = noteDuration.replace('r', '');
+        
+        // Time of note
+        let duration = noteDuration + 'n';
+        
+        if (note.isDotted) {
+          duration = duration + '.';
+        }
+        
+        // Only schedule the note if it is not rest
+        if (!note.duration.includes('r')) {
+          
+          // Schedule the note in the Transport (right time)
+          // after previous notes have been already played
+          sampler.triggerAttackRelease(note.pitch, duration, time + relativeTime);
+        }
+        
+        // Update our relativeTime
+        relativeTime += Tone.Time(duration).toSeconds();
+      }
+    });
+    
+    // Start Tone Transport
+    Tone.Transport.start();   
+  }
+}
