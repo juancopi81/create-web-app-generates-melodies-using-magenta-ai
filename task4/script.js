@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let note = {'duration': inputDuration, 'pitch': inputNote, 'isDotted': isDotted};
     
     // Add note to the array
-    notes = [...notes, {'duration': inputDuration, 'pitch': inputNote, 'isDotted': isDotted}];
+    notes = [...notes, note];
   }
 })
 
