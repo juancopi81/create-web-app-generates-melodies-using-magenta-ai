@@ -120,7 +120,7 @@ function parseNotesToVex(notes) {
         
         // Remove dot and add it to the right position
         noteString = noteDuration.replace('.', '');
-        noteString = 'B4/' + noteString + 'r.,';
+        noteString = 'B4/' + noteString + '/r.,';
         
       } else {
         
